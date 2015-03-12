@@ -1,59 +1,74 @@
 (function(){
 
-  var url = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
+  function initializeMap() {
+    var scotts_house, map;
+    // default options when first displaying the map
+    scotts_house = {
+      center: { lat: 39.957139, lng: -86.17521599999999 },
+      zoom: 15,
+      mapTypeId: google.maps.MapTypeId.HYBRID
+    };
 
-  // default options when first displaying the map
-  var scotts_house = {
-    center: { lat: 39.957139, lng: -86.17521599999999 },
-    zoom: 15,
-    mapTypeId: google.maps.MapTypeId.HYBRID
-  };
+    // create the map
+    map = new google.maps.Map($('#map')[0], scotts_house);
 
-  // create the map
-  var map = new google.maps.Map($('#map')[0], scotts_house);
+    // drop a marker
+    new google.maps.Marker({
+      position: scotts_house.center,
+      map: map,
+      title: 'Eleven Fifty Coding Academy'
+    });
 
-  // drop a marker
-  new google.maps.Marker({
-    position: scotts_house.center,
-    map: map,
-    title: 'Eleven Fifty Coding Academy'
-  });
+    return map;
+  }
 
-  var bounds = new google.maps.LatLngBounds();
+  function getCoordinates(location) {
+    return new google.maps.LatLng(location.lat, location.lng);
+  }
 
-  // watch for form submit
-  $('form#geocoder').submit(function(ev){
+  function addLocation(map, location) {
+    var coordinates = getCoordinates(location);
+    var map_options = {
+      center: coordinates,
+      zoom: 15,
+      mapTypeId: google.maps.MapTypeId.HYBRID
+    };
+    map.setOptions(map_options);
+    fitBounds(map, coordinates);
+    dropMarker(coordinates);
+  }
+
+  function fitBounds(map, coords) {
+    bounds.extend(coords);
+    map.fitBounds(bounds);
+  }
+
+  function dropMarker(coordinates, title) {
+    new google.maps.Marker({
+      position: coordinates,
+      map: map,
+      title: $('form#geocoder')[0].address
+    });
+  }
+
+  function updateLocation(ev) {
     ev.preventDefault();
     var address = this.address.value;
 
     // ask Google for the address coordinates
     $.get(url + address).success(function(data){
       var location = data.results[0].geometry.location;
-
-      // make coordinates object
-      var coords = new google.maps.LatLng(location.lat, location.lng);
-
-      var map_options = {
-        center: coords,
-        zoom: 15,
-        mapTypeId: google.maps.MapTypeId.HYBRID
-      };
-
-      // move map to new coordinates
-      map.setOptions(map_options);
-
-      // fit all markers on the map
-      bounds.extend(coords);
-      map.fitBounds(bounds);
-
-      // drop marker
-      new google.maps.Marker({
-        position: map_options.center,
-        map: map,
-        title: address
-      });
-
+      addLocation(map, location);
     });
-  });
+  }
+
+  var url = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
+
+  var map = initializeMap();
+
+  var bounds = new google.maps.LatLngBounds();
+
+  // watch for form submit
+  $('form#geocoder').submit(updateLocation);
 
 })();
