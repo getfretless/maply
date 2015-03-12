@@ -28,12 +28,11 @@
 
   function addLocation(map, location) {
     var coordinates = getCoordinates(location);
-    var map_options = {
+    map.setOptions({
       center: coordinates,
       zoom: 15,
       mapTypeId: google.maps.MapTypeId.HYBRID
-    };
-    map.setOptions(map_options);
+    });
     fitBounds(map, coordinates);
     dropMarker(coordinates);
   }
