@@ -26,6 +26,10 @@
     return new google.maps.LatLng(location.lat, location.lng);
   }
 
+  function createBoundaries() {
+    return new google.maps.LatLngBounds();
+  }
+
   function addLocation(map, location) {
     var coordinates = getCoordinates(location);
     map.setOptions({
@@ -65,9 +69,8 @@
 
   var map = initializeMap();
 
-  var bounds = new google.maps.LatLngBounds();
+  var bounds = createBoundaries();
 
-  // watch for form submit
   $('form#geocoder').submit(updateLocation);
 
 })();
