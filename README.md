@@ -367,6 +367,8 @@ function updateLocation(ev) {
     addLocation(map, location);
   });
 }
+
+$('form#geocoder').submit(updateLocation);
 ```
 
 Then extract the adding of the new location, and break that up into a few parts.
